@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+APP_ROOT = File.expand_path("..", __dir__)
+Dir.chdir(APP_ROOT)
+
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+def usage
+  warn <<~TEXT
+    bin/localnet - manage the Chain Ops local Solana validator
+
+      status
+      start
+      stop
+      reset
+
+    The validator uses:
+      ledger: tmp/solana-ledger
+      pid:    tmp/pids/solana-test-validator.pid
+      log:    log/localnet.log
+  TEXT
+  exit 1
+end
+
+def print_status(status)
+  puts "localnet: #{status[:running] ? "running" : "stopped"}"
+  puts "rpc:      #{status[:rpc_url]} (#{status[:rpc_health]})"
+  puts "realm:    #{status[:realm]}"
+  puts "pid:      #{status[:pid] || "none"}"
+  puts "version:  #{status[:validator_version]}"
+  puts "ledger:   #{status[:ledger_path]}"
+  puts "log:      #{status[:log_path]}"
+  puts
+  puts "Turf Monster env:"
+  status[:turf_monster_env].each { |key, value| puts "#{key}=#{value}" }
+  puts "SOLANA_PROGRAM_ID=<local deployed turf-vault program id>"
+end
+
+localnet = Localnet.new
+
+case ARGV.fetch(0, "status")
+when "status"
+  print_status(localnet.status)
+when "start"
+  result = localnet.start!
+  puts result.message
+  exit(result.ok? ? 0 : 1)
+when "stop"
+  result = localnet.stop!
+  puts result.message
+  exit(result.ok? ? 0 : 1)
+when "reset"
+  result = localnet.reset!
+  puts result.message
+  exit(result.ok? ? 0 : 1)
+else
+  usage
+end

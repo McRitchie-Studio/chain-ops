@@ -1,0 +1,99 @@
+<% content_for(:title, "Localnet Control") %>
+
+<section class="hero-panel">
+  <div class="hero-copy">
+    <p class="eyebrow">Solana local validator</p>
+    <h2><%= @status[:running] ? "Localnet is running" : "Localnet is stopped" %></h2>
+    <p>
+      Chain Ops manages a local `solana-test-validator` for Turf Monster and future
+      on-chain app work. The validator is disposable; QA and production contracts
+      stay on separate deploy tracks.
+    </p>
+  </div>
+
+  <div class="status-panel <%= @status[:running] ? "status-ok" : "status-idle" %>">
+    <span class="status-dot"></span>
+    <div>
+      <strong><%= @status[:running] ? "Running" : "Stopped" %></strong>
+      <span>RPC <%= @status[:rpc_health] %> at <%= @status[:rpc_url] %></span>
+    </div>
+  </div>
+</section>
+
+<section class="control-grid">
+  <div class="control-surface">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Controls</p>
+        <h3>Local Validator</h3>
+      </div>
+      <span class="realm-badge">realm: <%= @status[:realm] %></span>
+    </div>
+
+    <div class="button-row">
+      <%= button_to "Start", start_localnet_path, method: :post, class: "action-button action-primary", disabled: @status[:running] || !@status[:installed] %>
+      <%= button_to "Stop", stop_localnet_path, method: :post, class: "action-button", disabled: !@status[:running] %>
+      <%= button_to "Reset Ledger", reset_localnet_path, method: :post, class: "action-button action-danger", form: { data: { turbo_confirm: "Stop localnet, delete the local ledger, and restart fresh?" } }, disabled: !@status[:installed] %>
+    </div>
+
+    <% unless @status[:installed] %>
+      <p class="warning-text">`solana-test-validator` was not found on PATH.</p>
+    <% end %>
+
+    <dl class="detail-list">
+      <div>
+        <dt>Validator</dt>
+        <dd><%= @status[:validator_version] %></dd>
+      </div>
+      <div>
+        <dt>PID</dt>
+        <dd><%= @status[:pid].presence || "none" %></dd>
+      </div>
+      <div>
+        <dt>Faucet Port</dt>
+        <dd><%= @status[:faucet_port] %></dd>
+      </div>
+      <div>
+        <dt>Ledger</dt>
+        <dd><%= @status[:ledger_path] %></dd>
+      </div>
+      <div>
+        <dt>Log</dt>
+        <dd><%= @status[:log_path] %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="control-surface">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Turf Monster</p>
+        <h3>Localnet Env</h3>
+      </div>
+    </div>
+
+    <pre class="env-block"><% @status[:turf_monster_env].each do |key, value| %><%= key %>=<%= value %>
+<% end %>SOLANA_PROGRAM_ID=&lt;local deployed turf-vault program id&gt;</pre>
+
+    <p class="muted-copy">
+      Use these values for app work that should hit this validator. Local DB
+      reseeds may reset app state freely; contract deploys remain an explicit
+      release action.
+    </p>
+  </div>
+</section>
+
+<section class="control-surface">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Recent output</p>
+      <h3>Validator Log</h3>
+    </div>
+  </div>
+
+  <% if @status[:log_tail].any? %>
+    <pre class="log-block"><%= @status[:log_tail].join("\n") %></pre>
+  <% else %>
+    <p class="muted-copy">No localnet log has been written yet.</p>
+  <% end %>
+</section>
