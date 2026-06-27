@@ -11,7 +11,7 @@ README for Chain Ops-specific context.
 
 ## Current Scope
 
-- Local Rails dashboard at `http://localhost:3300`
+- Local Rails 8.1 dashboard at `http://localhost:3400`
 - Start, stop, reset, and inspect one local Solana validator
 - App-owned local ledger under `tmp/solana-ledger`
 - PID tracking under `tmp/pids/solana-test-validator.pid`
@@ -33,7 +33,7 @@ bin/rails server
 Open:
 
 ```text
-http://localhost:3300
+http://localhost:3400
 ```
 
 ## Localnet CLI
