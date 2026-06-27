@@ -18,7 +18,7 @@ gem "turbo-rails"
 gem "stimulus-rails"
 
 # Environment variables for local app profiles.
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 # Solana primitives for future Chain Ops program/IDL utilities. The first
 # localnet utility shells to the Solana CLI because validator lifecycle is a
