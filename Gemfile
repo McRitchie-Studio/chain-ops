@@ -1,7 +1,9 @@
 source "https://rubygems.org"
 
+ruby "3.3.11"
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.2.3", ">= 7.2.3.1"
+gem "rails", "~> 8.1.0"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # Use postgresql as the database for Active Record
@@ -16,7 +18,7 @@ gem "turbo-rails"
 gem "stimulus-rails"
 
 # Environment variables for local app profiles.
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 # Solana primitives for future Chain Ops program/IDL utilities. The first
 # localnet utility shells to the Solana CLI because validator lifecycle is a

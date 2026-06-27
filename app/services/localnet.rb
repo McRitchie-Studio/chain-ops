@@ -71,7 +71,7 @@ class Localnet
     ]
     args << "--reset" if reset
 
-    spawned_pid = Process.spawn(*args, chdir: root.to_s, out: log, err: [:child, :out], pgroup: true)
+    spawned_pid = Process.spawn(*args, chdir: root.to_s, out: log, err: [ :child, :out ], pgroup: true)
     pid_path.write(spawned_pid.to_s)
     sleep 0.35
 
