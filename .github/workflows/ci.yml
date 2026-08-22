@@ -3,7 +3,11 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    # THE LADDER'S THREE RUNGS, not just main. The release sweep's
+    # `refuse_blind_accepted!` guard ABORTS a promote when the repo's suite has
+    # no `push` trigger for `accepted` -- a branch nothing builds is a branch
+    # nothing certifies. Building `release` too closes the same hole one rung up.
+    branches: [ main, release, accepted ]
 
 jobs:
   scan_ruby:
@@ -73,8 +77,23 @@ jobs:
       #   options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      # NO google-chrome-stable. This job used to install a full browser and then run
+      # `test:system` against a `test/system` directory holding exactly one file: `.keep`.
+      # It certified nothing and charged every chain-ops PR for the privilege. The
+      # emptiness is a CHECKED fact, not an assumption — see the guard in
+      # test/lib/ci_system_lane_test.rb, which globs this repo's own tree and rides inside
+      # the very `bin/rails ... test` invocation below.
+      #
+      # WHEN A SYSTEM TEST LANDS, PUT THE LANE BACK. All of it, together: `test:system`
+      # back on the suite command, google-chrome-stable back on this line, the screenshot
+      # upload back at the end of this job, and SUITE_SCRIPT re-pointed in that guard. The
+      # guard goes red the moment test/system stops being empty and names the file that did
+      # it, which is the whole reason removing this is safe rather than merely cheaper.
+      #
+      # Ported from turf-monster (/tasks/drop-turf-empty-system-lane, its PR 365), which
+      # was in this exact state — empty tier, full browser, every PR paying for both.
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl libjemalloc2 postgresql-client
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y curl libjemalloc2 postgresql-client
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,17 +104,23 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      # `db:test:prepare test` — the SYSTEM tier is gone, with the browser above. ONLY
+      # `test:system` left this line: the model, controller, service and integration tiers
+      # all still ride the `test` task, which globs test/**/*_test.rb minus test/system.
+      #
+      # Keep db:test:prepare FIRST. `test` is a real rails COMMAND, so a rails-command first
+      # arg would parse the rest of the line as PATHS; a leading non-command routes the whole
+      # line through RAKE, where each token is a task. It is also what fires Rails' own
+      # `test:prepare` hook, and the hook is skipped the moment any argument looks like a path.
       - name: Run tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+        run: bin/rails db:test:prepare test
 
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore
+      # NO screenshot upload. `tmp/screenshots` is written by Rails SYSTEM tests and by
+      # nothing else in this repo, so the step went with the tier it served. The guard
+      # asserts this too, in BOTH directions: capture that outlives its tier is a job
+      # paying for a lane nobody runs, and a restored tier with no capture is a system
+      # failure you cannot see. Restore them together or not at all.
