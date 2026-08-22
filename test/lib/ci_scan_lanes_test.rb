@@ -78,6 +78,17 @@ class CiScanLanesTest < ActiveSupport::TestCase
   #
   # Repairing a lane and then deleting it are the same colour on the PR. Pin that
   # each lane still RUNS the command it is named for.
+  # The release sweep's `refuse_blind_accepted!` aborts a promote when the suite has
+  # no push trigger for `accepted`: it will not promote a branch nothing builds.
+  test "CI builds every rung of the ladder" do
+    branches = CI.fetch(true).fetch("push").fetch("branches")
+    %w[main release accepted].each do |rung|
+      assert_includes branches, rung,
+                      "a rung CI does not build cannot be certified, and the release " \
+                      "sweep refuses to promote from it"
+    end
+  end
+
   test "the three scan lanes still run their scanners" do
     assert_match(%r{bin/brakeman}, runs_of("scan_ruby"))
     assert_match(%r{bin/importmap audit}, runs_of("scan_js"))

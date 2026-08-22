@@ -3,7 +3,11 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    # THE LADDER'S THREE RUNGS, not just main. The release sweep's
+    # `refuse_blind_accepted!` guard ABORTS a promote when the repo's suite has
+    # no `push` trigger for `accepted` -- a branch nothing builds is a branch
+    # nothing certifies. Building `release` too closes the same hole one rung up.
+    branches: [ main, release, accepted ]
 
 jobs:
   scan_ruby:
