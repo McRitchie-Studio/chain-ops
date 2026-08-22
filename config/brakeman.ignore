@@ -1,0 +1,21 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 121,
+      "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 7.2.3.1 ended on 2026-08-09",
+      "file": "Gemfile.lock",
+      "line": 202,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": "KNOWN DEBT, tracked separately: chain-ops is on Rails 7.2.3.1, EOL 2026-08-09. Ignored so brakeman still EXITS NONZERO on any OTHER finding -- the alternative (--no-exit-on-warn) would blind the whole lane. REMOVE this entry when the Rails upgrade lands; brakeman then reports a stale fingerprint."
+    }
+  ],
+  "brakeman_version": "8.0.5"
+}
