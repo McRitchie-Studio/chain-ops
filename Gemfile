@@ -21,7 +21,7 @@ gem "dotenv-rails", groups: [ :development, :test ]
 # Solana primitives for future Chain Ops program/IDL utilities. The first
 # localnet utility shells to the Solana CLI because validator lifecycle is a
 # process concern rather than an RPC concern.
-gem "solana-studio", "~> 0.4.7"
+gem "solana-studio", "~> 0.5.0"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
