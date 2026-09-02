@@ -57,6 +57,27 @@ development:
 test:
   <<: *default
   database: chain_ops_test
+  # TEST_DATABASE_URL points the TEST env at a worktree's OWN isolated test DB.
+  # bin/agent-worktree already gives every desk one and writes it to
+  # .env.test.local -- but this app never had the line, so the variable was set,
+  # believed, and IGNORED: every desk's test lane fell through to the shared
+  # `chain_ops_test` above, and a cert's first act (`db:test:purge`) would DROP
+  # it under every concurrent run. bin/lib/desk_guard.rb refuses the G1 cert
+  # lane on this repo until this line exists, so NO chain-ops task could
+  # certify. Same defect turf-monster fixed; see its database.yml for the full
+  # measurement.
+  #
+  # A desk also exports DATABASE_URL at its seeded DEVELOPMENT database, and
+  # DATABASE_URL merges into whichever env is CURRENT -- so under RAILS_ENV=test
+  # it lands on this block. An explicit `url:` outranks it and takes that back.
+  #
+  # KEEP THE ERB BARE -- no default, no ENV.fetch. Unset, it renders empty,
+  # Rails treats an empty `url:` as absent, and this falls back to `database:`
+  # above with the DATABASE_URL merge intact. That is exactly what CI runs on:
+  # .github/workflows/ci.yml sets DATABASE_URL and never sets TEST_DATABASE_URL,
+  # so a hard-coded default here would outrank it and cut CI off from its own
+  # postgres service.
+  url: <%= ENV["TEST_DATABASE_URL"] %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
