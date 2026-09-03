@@ -34,3 +34,13 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Hidden per-task git worktrees created by bin/agent-worktree.
+#
+# Without this, a desk cut inside this repo shows up as a dirty primary. The
+# release tooling then warns that uncommitted work was left behind and prescribes
+# `git add -A && git commit`, which would commit every nested worktree into the
+# repo. Verified 2026-09-03: chain-ops was the LAST managed repo without this
+# rule -- mcritchie-studio, turf-monster, mcritchie-industries, studio-engine,
+# solana-studio, turf-vault and rolio all carry it on origin/main.
+/.worktrees/
