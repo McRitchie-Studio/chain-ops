@@ -58,6 +58,23 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
+  # Cap the local log file so it rotates instead of growing without bound.
+  # Rails' own default is 100 MB per environment, each keeping one rotated
+  # sibling, which is how ~400 MB of log accumulated per checkout in the one
+  # environment nobody watches. This repo does NOT depend on studio-engine, so
+  # it cannot inherit the `studio.logger` initializer that caps every consuming
+  # app; these two literals are the local stand-in and deliberately match
+  # Studio::LogRotation's DEVELOPMENT_MAX_BYTES / TEST_MAX_BYTES. Adopt the gem
+  # and this block should go. Background: mcritchie-studio
+  # docs/agents/maintenance/kickoff-log-rotation.md.
+  #
+  # `log_file_size` is the knob Rails' own :initialize_logger reads when it
+  # builds the logger. Setting config.logger here instead would be a silent
+  # no-op: :initialize_logger is a BOOTSTRAP initializer and has already run by
+  # the time an engine or railtie initializer gets a turn. Environment files
+  # load before it, which is why this works here.
+  config.log_file_size = 16 * 1024 * 1024
+
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 

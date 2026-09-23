@@ -53,6 +53,10 @@ Rails.application.configure do
   # Tell Active Support which deprecation messages to disallow.
   config.active_support.disallowed_deprecation_warnings = []
 
+  # Cap the local log file so it rotates instead of growing without bound; see
+  # the note in development.rb. A whole test run fits well inside 8 MB.
+  config.log_file_size = 8 * 1024 * 1024
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
