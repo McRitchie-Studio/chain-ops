@@ -6,7 +6,6 @@ Rails.application.config.assets.version = "1.0"
 # Add additional assets to the asset load path.
 # Rails.application.config.assets.paths << Emoji.images_path
 
-# Precompile additional assets.
-# application.js, application.css, and all non-JS/CSS in the app/assets
-# folder are already added.
-# Rails.application.config.assets.precompile += %w[ admin.js admin.css ]
+# Propshaft (not Sprockets) serves every file under app/assets/* as-is, at a
+# fingerprinted /assets URL. There is no precompile list and no manifest.js;
+# link a new stylesheet from the layout. Guard: test/lib/asset_pipeline_test.rb.
