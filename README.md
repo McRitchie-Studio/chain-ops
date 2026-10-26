@@ -79,6 +79,23 @@ Optional environment variables:
 | `CHAIN_OPS_LOCALNET_LEDGER` | `tmp/solana-ledger` | Local validator ledger path |
 | `SOLANA_REALM` | `local` | On-chain namespace/realm |
 
+## Asset Pipeline
+
+Chain Ops serves assets through **Propshaft** (moved off Sprockets 2026-10-25,
+task `chain-ops-moves-to-propshaft`, after rolio's recipe). Every file under
+`app/assets/*` is served raw at a fingerprinted `/assets/<name>-<digest>.<ext>`
+URL. There is no `manifest.js` and no `*= require` directive: link a new
+stylesheet from `app/views/layouts/application.html.erb`.
+
+- Precompile: `RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile`.
+  Clean up with `git clean -fdX public/assets` (nothing under it is tracked). While a
+  `public/assets/.manifest.json` sits there, development serves the precompiled copies,
+  not your edits.
+- Guards: `test/lib/asset_pipeline_test.rb` (Sprockets gem, manifest, directives or
+  Sprockets-only `config.assets.*` coming back) and `test/integration/asset_urls_test.rb`
+  (every `/assets` URL on the layout's pages, and every importmap pin, resolves
+  fingerprinted with a 200).
+
 ## Safety
 
 - Localnet is disposable and app-local.
