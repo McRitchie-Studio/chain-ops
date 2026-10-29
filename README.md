@@ -78,6 +78,7 @@ Optional environment variables:
 | `CHAIN_OPS_LOCALNET_RPC_URL` | derived | URL shown to apps |
 | `CHAIN_OPS_LOCALNET_LEDGER` | `tmp/solana-ledger` | Local validator ledger path |
 | `SOLANA_REALM` | `local` | On-chain namespace/realm |
+| `MAILER_FROM` | `Chain Ops <team@mcritchie.studio>` (also when blank) | Sender for `ApplicationMailer` mail. Every app sends from team@mcritchie.studio; a client's own sending domain is a tier upgrade. No transport is wired yet, so nothing is sent |
 
 ## Asset Pipeline
 
