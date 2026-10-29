@@ -16,6 +16,12 @@ class ApplicationMailerTest < ActionMailer::TestCase
     end
   end
 
+  test "a blank MAILER_FROM falls back to the team address, never an empty sender" do
+    with_env("MAILER_FROM" => "  ") do
+      assert_equal "Chain Ops <team@mcritchie.studio>", resolved_from
+    end
+  end
+
   test "MAILER_FROM overrides the default" do
     with_env("MAILER_FROM" => "Client <hello@client.test>") do
       assert_equal "Client <hello@client.test>", resolved_from
